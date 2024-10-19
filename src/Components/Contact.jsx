@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Users, Phone, MapPin } from 'lucide-react'; // Import icons
+import React, { useState, useEffect } from 'react';
+import { Users, Phone, MapPin } from 'lucide-react';
 import styles from './Contact.module.css';
 
 const Contact = () => {
@@ -7,45 +7,48 @@ const Contact = () => {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [message, setMessage] = useState('');
-  const [error, setError] = useState({ name: '', phone: '', message: '' });
+  const [error, setError] = useState({ name: '', email: '', phone: '', message: '' });
+  const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    document.getElementById('nameInput').focus(); // Focus on the name input
+  }, []);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     let valid = true;
-    const newError = { name: '', phone: '', message: '' }; // Reset error messages
+    const newError = { name: '', email: '', phone: '', message: '' };
 
-    // Validate the phone number
-    if (!/^\d{10}$/.test(phoneNumber)) {
-      newError.phone = 'Please enter a valid 10-digit phone number.';
-      valid = false;
-    }
-
-    // Validate the name
     if (!/^[a-zA-Z\s]+$/.test(name)) {
       newError.name = 'Please enter a valid name (letters only).';
       valid = false;
     }
 
-    // Validate the message
-    if (!message) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newError.email = 'Please enter a valid email address.';
+      valid = false;
+    }
+
+    if (!/^\d{10}$/.test(phoneNumber)) {
+      newError.phone = 'Please enter a valid 10-digit phone number.';
+      valid = false;
+    }
+
+    if (!message.trim()) {
       newError.message = 'Please enter your message.';
       valid = false;
     }
 
-    // Update state with new error messages
     setError(newError);
 
-    // Simulate form submission logic if valid
     if (valid) {
-      const formData = { name, email, phoneNumber, message };
-      console.log('Form submitted successfully with data:', formData);
-      
-      // Reset form fields
+      console.log('Form submitted successfully with data:', { name, email, phoneNumber, message });
+      setSuccessMessage('Form submitted successfully!');
       setName('');
       setEmail('');
       setPhoneNumber('');
       setMessage('');
-      setError({ name: '', phone: '', message: '' }); // Clear errors
+      setError({ name: '', email: '', phone: '', message: '' });
     }
   };
 
@@ -53,54 +56,59 @@ const Contact = () => {
     <div className={styles.contact}>
       <div className={styles.contactbox}>
         <h1 className={styles.contacttitle}>Contact Us</h1>
-        <p className={styles.contactsubtitle}>
-          Any questions or remarks? Just write us a message!
-        </p>
-
+        
         <form className={styles.contactform} onSubmit={handleSubmit}>
-          {/* First Group of Inputs (Name and Email) */}
-          <div className={styles.contactinputgroup}>
+          {/* Name Input */}
+          <div className={styles.inputWrapper}>
             <input
+              id="nameInput"
               type="text"
               placeholder="Enter your Name"
-              className={styles.contactinput}
+              className={`${styles.contactinput} ${error.name ? styles.errorInput : ''}`}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
-            {error.name && <p className={styles.error}>{error.name}</p>}
-            
+            {error.name && <p className={styles.errorMessage} aria-live="polite">{error.name}</p>}
+          </div>
+
+          {/* Email Input */}
+          <div className={styles.inputWrapper}>
             <input
               type="email"
               placeholder="Enter a valid email address"
-              className={styles.contactinput}
+              className={`${styles.contactinput} ${error.email ? styles.errorInput : ''}`}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+            {error.email && <p className={styles.errorMessage} aria-live="polite">{error.email}</p>}
           </div>
 
-          {/* Second Group (Phone and Message) */}
-          <div className={styles.contactinputgroup}>
+          {/* Phone Number Input */}
+          <div className={styles.inputWrapper}>
             <input
               type="tel"
               placeholder="Enter a valid phone number"
-              className={styles.contactinput}
+              className={`${styles.contactinput} ${error.phone ? styles.errorInput : ''}`}
               maxLength="10"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               required
             />
-            {error.phone && <p className={styles.error}>{error.phone}</p>}
-            
+            {error.phone && <p className={styles.errorMessage} aria-live="polite">{error.phone}</p>}
+          </div>
+
+          {/* Message Textarea */}
+          <div className={styles.inputWrapper}>
             <textarea
               placeholder="Enter your Message"
-              className={styles.contactinput}
+              className={`${styles.contactinput} ${error.message ? styles.errorInput : ''}`}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               required
             />
-            {error.message && <p className={styles.error}>{error.message}</p>}
+            {error.message && <p className={styles.errorMessage} aria-live="polite">{error.message}</p>}
           </div>
 
           <button type="submit" className={styles.contactsubmitbtn}>
@@ -108,7 +116,8 @@ const Contact = () => {
           </button>
         </form>
 
-        {/* Icon Container */}
+        {successMessage && <p className={styles.successMessage}>{successMessage}</p>}
+
         <div className={styles.iconcontainer}>
           <div className={styles.contactinfo}>
             <div className={styles.infoitem}>
