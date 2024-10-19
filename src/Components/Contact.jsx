@@ -1,54 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { Users, Phone, MapPin } from 'lucide-react';
+import React, { useState } from 'react';
+import { Users, Phone, MapPin } from 'lucide-react'; // Import icons
 import styles from './Contact.module.css';
 
 const Contact = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState({ name: '', email: '', phone: '', message: '' });
-  const [successMessage, setSuccessMessage] = useState('');
-
-  useEffect(() => {
-    document.getElementById('nameInput').focus(); // Focus on the name input
-  }, []);
+  const [error, setError] = useState({ name: '', phone: '' });
 
   const handleSubmit = (event) => {
     event.preventDefault();
     let valid = true;
-    const newError = { name: '', email: '', phone: '', message: '' };
+    const newError = { name: '', phone: '' }; // Reset error messages
 
+    // Validate the phone number
+    if (!/^\d{10}$/.test(phoneNumber)) {
+      newError.phone = 'Please enter a valid 10-digit phone number.';
+      
+     valid = false;
+    }
+
+    // Validate the name
     if (!/^[a-zA-Z\s]+$/.test(name)) {
       newError.name = 'Please enter a valid name (letters only).';
       valid = false;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newError.email = 'Please enter a valid email address.';
-      valid = false;
-    }
-
-    if (!/^\d{10}$/.test(phoneNumber)) {
-      newError.phone = 'Please enter a valid 10-digit phone number.';
-      valid = false;
-    }
-
-    if (!message.trim()) {
-      newError.message = 'Please enter your message.';
-      valid = false;
-    }
-
+    // Update state with new error messages
     setError(newError);
 
+    // Proceed with form submission logic if valid
     if (valid) {
-      console.log('Form submitted successfully with data:', { name, email, phoneNumber, message });
-      setSuccessMessage('Form submitted successfully!');
-      setName('');
-      setEmail('');
-      setPhoneNumber('');
-      setMessage('');
-      setError({ name: '', email: '', phone: '', message: '' });
+      // Reset the error message
+      setError({ name: '', phone: '' });
+      // Your submission logic here (e.g., send data to an API)
     }
   };
 
@@ -56,59 +41,51 @@ const Contact = () => {
     <div className={styles.contact}>
       <div className={styles.contactbox}>
         <h1 className={styles.contacttitle}>Contact Us</h1>
-        
+        <p className={styles.contactsubtitle}>
+          {/* Any questions or remarks? Just write us a message! */}
+        </p>
+
         <form className={styles.contactform} onSubmit={handleSubmit}>
-          {/* Name Input */}
-          <div className={styles.inputWrapper}>
+          {/* First Group of Inputs (Email and Name) */}
+          <div className={styles.contactinputgroup}>
             <input
-              id="nameInput"
               type="text"
               placeholder="Enter your Name"
-              className={`${styles.contactinput} ${error.name ? styles.errorInput : ''}`}
+              className={styles.contactinput}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
-            {error.name && <p className={styles.errorMessage} aria-live="polite">{error.name}</p>}
-          </div>
-
-          {/* Email Input */}
-          <div className={styles.inputWrapper}>
+            {error.name && <p className={styles.error}>{error.name}</p>}
+            
             <input
               type="email"
               placeholder="Enter a valid email address"
-              className={`${styles.contactinput} ${error.email ? styles.errorInput : ''}`}
+              className={styles.contactinput}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-            {error.email && <p className={styles.errorMessage} aria-live="polite">{error.email}</p>}
           </div>
 
-          {/* Phone Number Input */}
-          <div className={styles.inputWrapper}>
+          {/* Second Group (Address and Phone) */}
+          <div className={styles.contactinputgroup}>
             <input
               type="tel"
               placeholder="Enter a valid phone number"
-              className={`${styles.contactinput} ${error.phone ? styles.errorInput : ''}`}
+              className={styles.contactinput}
               maxLength="10"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               required
             />
-            {error.phone && <p className={styles.errorMessage} aria-live="polite">{error.phone}</p>}
-          </div>
-
-          {/* Message Textarea */}
-          <div className={styles.inputWrapper}>
+            {error.phone && <p className={styles.error}>{error.phone}</p>}
+            
             <textarea
               placeholder="Enter your Message"
-              className={`${styles.contactinput} ${error.message ? styles.errorInput : ''}`}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              className={styles.contactinput}
               required
             />
-            {error.message && <p className={styles.errorMessage} aria-live="polite">{error.message}</p>}
           </div>
 
           <button type="submit" className={styles.contactsubmitbtn}>
@@ -116,8 +93,7 @@ const Contact = () => {
           </button>
         </form>
 
-        {successMessage && <p className={styles.successMessage}>{successMessage}</p>}
-
+        {/* Icon Container */}
         <div className={styles.iconcontainer}>
           <div className={styles.contactinfo}>
             <div className={styles.infoitem}>
