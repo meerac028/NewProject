@@ -6,12 +6,13 @@ const Contact = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [error, setError] = useState({ name: '', phone: '' });
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState({ name: '', phone: '', message: '' });
 
   const handleSubmit = (event) => {
     event.preventDefault();
     let valid = true;
-    const newError = { name: '', phone: '' }; // Reset error messages
+    const newError = { name: '', phone: '', message: '' }; // Reset error messages
 
     // Validate the phone number
     if (!/^\d{10}$/.test(phoneNumber)) {
@@ -25,14 +26,26 @@ const Contact = () => {
       valid = false;
     }
 
+    // Validate the message
+    if (!message) {
+      newError.message = 'Please enter your message.';
+      valid = false;
+    }
+
     // Update state with new error messages
     setError(newError);
 
-    // Proceed with form submission logic if valid
+    // Simulate form submission logic if valid
     if (valid) {
-      // Reset the error message
-      setError({ name: '', phone: '' });
-      // Your submission logic here (e.g., send data to an API)
+      const formData = { name, email, phoneNumber, message };
+      console.log('Form submitted successfully with data:', formData);
+      
+      // Reset form fields
+      setName('');
+      setEmail('');
+      setPhoneNumber('');
+      setMessage('');
+      setError({ name: '', phone: '', message: '' }); // Clear errors
     }
   };
 
@@ -41,11 +54,11 @@ const Contact = () => {
       <div className={styles.contactbox}>
         <h1 className={styles.contacttitle}>Contact Us</h1>
         <p className={styles.contactsubtitle}>
-          {/* Any questions or remarks? Just write us a message! */}
+          Any questions or remarks? Just write us a message!
         </p>
 
         <form className={styles.contactform} onSubmit={handleSubmit}>
-          {/* First Group of Inputs (Email and Name) */}
+          {/* First Group of Inputs (Name and Email) */}
           <div className={styles.contactinputgroup}>
             <input
               type="text"
@@ -53,7 +66,8 @@ const Contact = () => {
               className={styles.contactinput}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required/>
+              required
+            />
             {error.name && <p className={styles.error}>{error.name}</p>}
             
             <input
@@ -66,7 +80,7 @@ const Contact = () => {
             />
           </div>
 
-          {/* Second Group (Address and Phone) */}
+          {/* Second Group (Phone and Message) */}
           <div className={styles.contactinputgroup}>
             <input
               type="tel"
@@ -82,8 +96,11 @@ const Contact = () => {
             <textarea
               placeholder="Enter your Message"
               className={styles.contactinput}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
               required
             />
+            {error.message && <p className={styles.error}>{error.message}</p>}
           </div>
 
           <button type="submit" className={styles.contactsubmitbtn}>
